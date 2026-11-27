@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapphire IQ — Amazon India Performance & Comparison Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════ INTRO WELCOME SCREEN ═══════════════════════ -->
+<div id="intro-screen" role="dialog" aria-modal="true" aria-label="Welcome to Sapphire IQ Dashboard">
+
+  <!-- animated background mesh blobs -->
+  <div class="intro-bg">
+    <div class="intro-blob intro-blob-1"></div>
+    <div class="intro-blob intro-blob-2"></div>
+    <div class="intro-blob intro-blob-3"></div>
+  </div>
+
+  <div class="intro-card">
+
+    <!-- badge -->
+    <div class="intro-badge">
+      <span class="intro-badge-dot"></span>
+      Sapphire IQ &nbsp;×&nbsp; Amazon India
+    </div>
+
+    <!-- headline -->
+    <h1 class="intro-headline">
+      Amazon India<br>
+      <span class="intro-headline-accent">Sales &amp; Profit Intelligence</span>
+    </h1>
+
+    <!-- subtitle -->
+    <p class="intro-subtitle">
+      Prepared by <strong>Manoj</strong> for <strong>Ravi</strong>&nbsp;•&nbsp;
+      10,000 Orders (2024–2026)&nbsp;•&nbsp;Interactive Visual &amp; Comparison Studio
+    </p>
+
+    <!-- scope pills -->
+    <div class="intro-pills">
+      <span class="intro-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        10,000 Orders Analyzed
+      </span>
+      <span class="intro-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        5 Categories &nbsp;•&nbsp; 10 States
+      </span>
+      <span class="intro-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Comparison &amp; PDF/PNG Export
+      </span>
+    </div>
+
+    <!-- divider -->
+    <div class="intro-divider"></div>
+
+    <!-- CTA buttons -->
+    <div class="intro-actions">
+      <button class="intro-btn-primary" id="intro-launch" onclick="launchDashboard()">
+        Launch Dashboard
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+      <div class="intro-secondary-row">
+        <button class="intro-btn-secondary" onclick="launchDashboard('s3')">
+          Open Comparison Studio
+        </button>
+        <button class="intro-btn-secondary" onclick="launchDashboard('s4')">
+          View Revenue Leakage
+        </button>
+      </div>
+    </div>
+
+    <!-- footer note -->
+    <p class="intro-footer">
+      ₹15.58 Cr Gross Sales &nbsp;·&nbsp; ₹3.32 Cr Profit &nbsp;·&nbsp; 5 Product Categories
+    </p>
+
+  </div>
+</div>
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+<div id="dashboard-wrapper">
+
+<!-- HEADER -->
+<div id="header">
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-icon">SI</div>
+      <div class="logo-text">
+        <h1>Sapphire IQ</h1>
+        <p>Amazon India Performance &amp; Comparison Dashboard</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-intro-replay" onclick="showIntro()" title="Return to welcome screen">
+        ⌂ Intro
+      </button>
+      
+      <div class="toggle-pill">
+        <button class="active" id="btn-gross" onclick="setRevenueMode('gross')">Gross Order Value</button>
+        <button id="btn-net" onclick="setRevenueMode('net')">Net Realized Sales</button>
+      </div>
+      <div style="position:relative">
+        <button class="btn btn-primary" onclick="toggleExportMenu()">⬇ Export &amp; Share</button>
+        <div class="export-menu" id="export-menu">
+          <div class="export-item" onclick="exportPDF()">📄 Download Executive PDF Report</div>
+          <div class="export-item" onclick="exportFullPNG()">🖼 Download Full Dashboard PNG</div>
+          <div class="export-item" onclick="openDropzone()">📂 Load New .xlsx / .csv File</div>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="openDropzone()">📂 Load Data</button>
+    </div>
+  </div>
+  <div class="filters-bar">
+    <span class="filter-label">FILTER:</span>
+    <select class="filter-select" id="f-year" onchange="applyFilters()">
+      <option value="">All Years</option>
+      <option>2024</option><option>2025</option><option>2026</option>
+    </select>
+    <select class="filter-select" id="f-category" onchange="applyFilters()">
+      <option value="">All Categories</option>
+      <option>Apparel &amp; Fashion</option>
+      <option>Beauty &amp; Personal Care</option>
+      <option>Electronics &amp; Mobiles</option>
+      <option>Home &amp; Kitchen</option>
+      <option>Pantry &amp; Groceries</option>
+    </select>
+    <select class="filter-select" id="f-state" onchange="applyFilters()">
+      <option value="">All States</option>
+      <option>Maharashtra</option><option>Karnataka</option><option>Telangana</option>
+      <option>Tamil Nadu</option><option>Uttar Pradesh</option><option>Delhi</option>
+      <option>West Bengal</option><option>Gujarat</option><option>Rajasthan</option><option>Kerala</option>
+    </select>
+    <select class="filter-select" id="f-fulfillment" onchange="applyFilters()">
+      <option value="">All Fulfillment</option>
+      <option>Amazon (FBA)</option><option>Seller Flex</option><option>Merchant (FBM)</option>
+    </select>
+    <select class="filter-select" id="f-payment" onchange="applyFilters()">
+      <option value="">All Payments</option>
+      <option>UPI</option><option>Credit/Debit Card</option>
+      <option>Cash on Delivery (COD)</option><option>Net Banking</option><option>Amazon Pay Later</option>
+    </select>
+    <select class="filter-select" id="f-status" onchange="applyFilters()">
+      <option value="">All Statuses</option>
+      <option>Delivered</option><option>Shipped</option><option>Returned</option><option>Cancelled</option>
+    </select>
+    <div class="active-filters" id="active-filter-chips"></div>
+    <button class="btn btn-outline" onclick="clearFilters()" style="padding:5px 12px;font-size:0.7rem">✕ Clear</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<div id="nav">
+  <div class="nav-tabs" id="nav-tabs">
+    <button class="nav-tab active" onclick="scrollToSection('s1',this)">① Executive Pulse</button>
+    <button class="nav-tab" onclick="scrollToSection('s2',this)">② Category &amp; Product</button>
+    <button class="nav-tab" onclick="scrollToSection('s3',this)">③ Comparison Studio</button>
+    <button class="nav-tab" onclick="scrollToSection('s4',this)">④ Order Funnel</button>
+    <button class="nav-tab" onclick="scrollToSection('s5',this)">⑤ Geography &amp; Channels</button>
+    <div class="nav-indicator" id="nav-indicator" style="left:0;width:0"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main id="dashboard">
+
+<!-- SECTION 1: EXECUTIVE PULSE -->
+<section id="s1">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-title">Executive Pulse &amp; Trajectory <span>Interactive Sales, Profit &amp; Operations Intelligence</span></div>
+    </div>
+    <span class="section-badge badge-indigo">📊 KPI Overview</span>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="grid grid-4 reveal" id="kpi-grid">
+    <div class="card kpi-card kpi-primary" id="kpi-gross-sales" onclick="kpiClick('grossSales')">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-value" id="kv-gross">₹0</div>
+      <div class="kpi-label">Gross Order Value</div>
+      <div class="kpi-sub"><span class="trend trend-up">↑ All Orders</span></div>
+    </div>
+    <div class="card kpi-card kpi-profit" id="kpi-net-sales" onclick="kpiClick('netSales')">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-value" id="kv-net">₹0</div>
+      <div class="kpi-label">Net Realized Sales</div>
+      <div class="kpi-sub"><span class="trend trend-up">Delivered + Shipped</span></div>
+    </div>
+    <div class="card kpi-card kpi-profit" id="kpi-profit" onclick="kpiClick('profit')">
+      <div class="kpi-icon">📈</div>
+      <div class="kpi-value" id="kv-profit">₹0</div>
+      <div class="kpi-label">Total Profit</div>
+      <div class="kpi-sub" id="kv-margin"><span class="trend trend-up">0% Margin</span></div>
+    </div>
+    <div class="card kpi-card kpi-risk" id="kpi-lost" onclick="kpiClick('lostRevenue')">
+      <div class="kpi-icon">⚠️</div>
+      <div class="kpi-value" id="kv-lost">₹0</div>
+      <div class="kpi-label">Revenue Lost (Returns+Cancel)</div>
+      <div class="kpi-sub" id="kv-lost-pct"><span class="trend trend-dn">0% of Gross</span></div>
+    </div>
+    <div class="card kpi-card kpi-orders" onclick="kpiClick('orders')">
+      <div class="kpi-icon">📦</div>
+      <div class="kpi-value" id="kv-orders">0</div>
+      <div class="kpi-label">Total Orders</div>
+      <div class="kpi-sub"><span class="trend trend-up">All Statuses</span></div>
+    </div>
+    <div class="card kpi-card kpi-orders" onclick="kpiClick('units')">
+      <div class="kpi-icon">🛒</div>
+      <div class="kpi-value" id="kv-units">0</div>
+      <div class="kpi-label">Units Sold</div>
+      <div class="kpi-sub"><span class="trend trend-up">Total Quantity</span></div>
+    </div>
+    <div class="card kpi-card kpi-primary" onclick="kpiClick('aov')">
+      <div class="kpi-icon">🎯</div>
+      <div class="kpi-value" id="kv-aov">₹0</div>
+      <div class="kpi-label">Avg Order Value (AOV)</div>
+      <div class="kpi-sub"><span class="trend trend-up">Per Transaction</span></div>
+    </div>
+    <div class="card kpi-card kpi-risk" onclick="kpiClick('returnRate')">
+      <div class="kpi-icon">🔄</div>
+      <div class="kpi-value" id="kv-return">0%</div>
+      <div class="kpi-label">Return + Cancel Rate</div>
+      <div class="kpi-sub" id="kv-return-sub"><span class="trend trend-dn">0 orders lost</span></div>
+    </div>
+  </div>
+
+  <!-- TIME SERIES -->
+  <div class="card reveal" style="margin-top:16px">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Sales &amp; Profit Trajectory</div>
+        <div style="font-size:0.7rem;color:var(--text-xs);margin-top:3px">Monthly performance across 2024–2026</div>
+      </div>
+      <div class="card-actions">
+        <div class="lens-switcher">
+          <button class="lens-btn active" onclick="setTimeLens('dual',this)">Monthly Trend</button>
+          <button class="lens-btn" onclick="setTimeLens('cumul',this)">Cumulative</button>
+          <button class="lens-btn" onclick="setTimeLens('qtr',this)">Quarterly</button>
+        </div>
+        <button class="icon-btn" onclick="downloadChart('time-series-chart')" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+      </div>
+    </div>
+    <div class="chart-wrap chart-wrap-tall" id="time-series-wrap">
+      <canvas id="time-series-chart"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: CATEGORY & PRODUCT -->
+<section id="s2">
+  <div class="section-header reveal">
+    <div class="section-title">Category &amp; Product Intelligence</div>
+    <span class="section-badge badge-blue">🔍 Deep Dive</span>
+  </div>
+
+  <div class="grid grid-2 reveal">
+    <!-- CATEGORY LENS -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Category Performance</div>
+        </div>
+        <div class="card-actions">
+          <div class="lens-switcher">
+            <button class="lens-btn active" onclick="setCatLens('bar',this)">Bar</button>
+            <button class="lens-btn" onclick="setCatLens('radar',this)">Radar</button>
+            <button class="lens-btn" onclick="setCatLens('tree',this)">Treemap</button>
+          </div>
+          <button class="icon-btn" onclick="downloadChart('cat-chart')" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+        </div>
+      </div>
+      <div id="cat-bar-wrap" class="chart-wrap chart-wrap-tall"><canvas id="cat-chart"></canvas></div>
+      <div id="cat-radar-wrap" class="chart-wrap chart-wrap-tall" style="display:none"><canvas id="cat-radar-chart"></canvas></div>
+      <div id="cat-tree-wrap" style="display:none;padding:8px 0"><div id="cat-treemap"></div></div>
+    </div>
+
+    <!-- PRODUCT LENS -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Product Intelligence</div>
+        </div>
+        <div class="card-actions">
+          <div class="lens-switcher">
+            <button class="lens-btn active" onclick="setProdLens('top',this)">Top 10</button>
+            <button class="lens-btn" onclick="setProdLens('pareto',this)">Pareto</button>
+            <button class="lens-btn" onclick="setProdLens('bubble',this)">Bubble</button>
+          </div>
+          <button class="icon-btn" onclick="downloadChart('prod-chart')" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+        </div>
+      </div>
+      <div id="prod-top-wrap" class="chart-wrap chart-wrap-tall"><canvas id="prod-chart"></canvas></div>
+      <div id="prod-pareto-wrap" class="chart-wrap chart-wrap-tall" style="display:none"><canvas id="prod-pareto-chart"></canvas></div>
+      <div id="prod-bubble-wrap" class="chart-wrap chart-wrap-tall" style="display:none"><canvas id="prod-bubble-chart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- SORT CONTROLS FOR TOP PRODUCTS -->
+  <div class="reveal" style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span class="filter-label">SORT PRODUCTS BY:</span>
+    <div class="toggle-pill">
+      <button class="active" onclick="setProdSort('sales',this)">Sales</button>
+      <button onclick="setProdSort('profit',this)">Profit</button>
+      <button onclick="setProdSort('margin',this)">Margin %</button>
+      <button onclick="setProdSort('units',this)">Units</button>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: COMPARISON STUDIO -->
+<section id="s3">
+  <div class="section-header reveal">
+    <div class="section-title">Head-to-Head Comparison Studio</div>
+    <span class="section-badge badge-indigo">⚡ Compare Anything</span>
+  </div>
+
+  <div class="comp-studio reveal">
+    <!-- DIMENSION & PRESETS -->
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap">
+      <div>
+        <div class="filter-label" style="margin-bottom:4px">COMPARE DIMENSION</div>
+        <select class="filter-select" id="comp-dim" onchange="onCompDimChange()">
+          <option value="category">Category</option>
+          <option value="state">Ship State</option>
+          <option value="payment">Payment Method</option>
+          <option value="fulfillment">Fulfillment</option>
+          <option value="year">Year</option>
+          <option value="product">Product</option>
+        </select>
+      </div>
+      <div>
+        <div class="filter-label" style="margin-bottom:4px">ENTITY A</div>
+        <select class="filter-select" id="comp-a" onchange="runComparison()"></select>
+      </div>
+      <div>
+        <div class="filter-label" style="margin-bottom:4px">ENTITY B</div>
+        <select class="filter-select" id="comp-b" onchange="runComparison()"></select>
+      </div>
+    </div>
+
+    <div class="filter-label" style="margin-bottom:8px">QUICK PRESETS</div>
+    <div class="preset-row">
+      <div class="preset-chip" onclick="setPreset('category','Electronics &amp; Mobiles','Home &amp; Kitchen')">Electronics vs Home</div>
+      <div class="preset-chip" onclick="setPreset('state','Maharashtra','Karnataka')">Maharashtra vs Karnataka</div>
+      <div class="preset-chip" onclick="setPreset('fulfillment','Amazon (FBA)','Seller Flex')">FBA vs Seller Flex</div>
+      <div class="preset-chip" onclick="setPreset('payment','UPI','Cash on Delivery (COD)')">UPI vs COD</div>
+      <div class="preset-chip" onclick="setPreset('year','2024','2025')">2024 vs 2025</div>
+      <div class="preset-chip" onclick="setPreset('year','2025','2026')">2025 vs 2026</div>
+    </div>
+
+    <!-- SCORECARD -->
+    <div class="comp-entity-row" id="comp-scorecard" style="margin-top:20px">
+      <div class="card comp-entity entity-a" id="comp-entity-a-card">
+        <h4 id="comp-a-name">Select Entity A</h4>
+        <div id="comp-a-kpis"></div>
+      </div>
+      <div class="comp-vs">VS</div>
+      <div class="card comp-entity entity-b" id="comp-entity-b-card">
+        <h4 id="comp-b-name">Select Entity B</h4>
+        <div id="comp-b-kpis"></div>
+      </div>
+    </div>
+
+    <!-- DELTA TABLE -->
+    <div class="card reveal" style="margin-top:16px">
+      <div class="card-title" style="margin-bottom:12px">Metric Comparison Table — Click a Row to Visualize</div>
+      <div id="comp-metric-table"></div>
+    </div>
+
+    <!-- COMP CHARTS -->
+    <div class="grid grid-2 reveal" style="margin-top:16px">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Radar Fingerprint</div>
+          <button class="icon-btn" onclick="downloadChart('comp-radar-chart')" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+        </div>
+        <div class="chart-wrap"><canvas id="comp-radar-chart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Monthly Trend Overlay</div>
+          <button class="icon-btn" onclick="downloadChart('comp-trend-chart')" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+        </div>
+        <div class="chart-wrap"><canvas id="comp-trend-chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- WHAT-IF -->
+    <div class="card reveal" style="margin-top:16px">
+      <div class="card-header">
+        <div class="card-title">💡 What-If Profit Recovery Simulator</div>
+      </div>
+      <div class="grid grid-2">
+        <div class="slider-wrap">
+          <div class="slider-row">
+            <div class="slider-labels">
+              <span class="slider-name">Reduce Return/Cancel Rate by</span>
+              <span class="slider-val" id="slider-ret-val">0%</span>
+            </div>
+            <input type="range" min="0" max="100" value="0" id="slider-ret" oninput="updateWhatIf()">
+          </div>
+          <div class="slider-row">
+            <div class="slider-labels">
+              <span class="slider-name">Optimize Avg Discount by</span>
+              <span class="slider-val" id="slider-disc-val">0%</span>
+            </div>
+            <input type="range" min="-5" max="5" step="0.5" value="0" id="slider-disc" oninput="updateWhatIf()">
+          </div>
+        </div>
+        <div class="recovery-box">
+          <div class="rec-val" id="whatif-val">₹0</div>
+          <div class="rec-lbl">Projected Additional Profit Recovery</div>
+          <div style="font-size:0.68rem;color:var(--text-xs);margin-top:6px" id="whatif-breakdown"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: ORDER FUNNEL -->
+<section id="s4">
+  <div class="section-header reveal">
+    <div class="section-title">Order Funnel &amp; Revenue Leakage</div>
+    <span class="section-badge badge-amber">⚡ Revenue at Risk</span>
+  </div>
+
+  <div class="grid grid-2 reveal">
+    <!-- FUNNEL -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Animated Order Lifecycle Funnel</div>
+        <button class="icon-btn" onclick="captureCard(this.closest('.card'))" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+      </div>
+      <div class="funnel" id="funnel-steps">
+        <!-- filled by JS -->
+      </div>
+      <div class="insight-box" style="margin-top:16px">
+        <span class="insight-icon">💡</span>
+        <div class="insight-text" id="funnel-insight"></div>
+      </div>
+    </div>
+
+    <!-- PAYMENT x STATUS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Payment × Return/Cancel Risk Matrix</div>
+        <button class="icon-btn" onclick="downloadChart('pay-status-chart')" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+      </div>
+      <div class="chart-wrap"><canvas id="pay-status-chart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- CATEGORY RETURNS -->
+  <div class="card reveal" style="margin-top:16px">
+    <div class="card-header">
+      <div class="card-title">Category-Wise Returns &amp; Cancellations</div>
+      <div class="card-actions">
+        <div class="lens-switcher">
+          <button class="lens-btn active" onclick="setCatRetLens('count',this)">Order Count</button>
+          <button class="lens-btn" onclick="setCatRetLens('revenue',this)">Lost Revenue ₹</button>
+        </div>
+        <button class="icon-btn" onclick="downloadChart('cat-ret-chart')" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="cat-ret-chart"></canvas></div>
+  </div>
+</section>
+
+<!-- SECTION 5: GEO & CHANNELS -->
+<section id="s5">
+  <div class="section-header reveal">
+    <div class="section-title">Payment, Fulfillment &amp; Geographic Matrix</div>
+    <span class="section-badge badge-green">🌍 Channels & Regions</span>
+  </div>
+
+  <!-- HEATMAP -->
+  <div class="card reveal">
+    <div class="card-header">
+      <div class="card-title">Interactive 2D Cross-Tab Heatmap</div>
+      <div class="card-actions" style="flex-wrap:wrap;gap:6px">
+        <select class="filter-select" id="hm-row" onchange="renderHeatmap()" style="font-size:0.7rem;padding:4px 8px">
+          <option value="state">Row: State</option>
+          <option value="category">Row: Category</option>
+          <option value="payment">Row: Payment</option>
+          <option value="fulfillment">Row: Fulfillment</option>
+        </select>
+        <select class="filter-select" id="hm-col" onchange="renderHeatmap()" style="font-size:0.7rem;padding:4px 8px">
+          <option value="category">Col: Category</option>
+          <option value="state">Col: State</option>
+          <option value="payment">Col: Payment</option>
+          <option value="fulfillment">Col: Fulfillment</option>
+        </select>
+        <select class="filter-select" id="hm-metric" onchange="renderHeatmap()" style="font-size:0.7rem;padding:4px 8px">
+          <option value="sales">Sales ₹</option>
+          <option value="profit">Profit ₹</option>
+          <option value="orders">Orders</option>
+          <option value="margin">Margin %</option>
+          <option value="retrate">Return+Cancel %</option>
+        </select>
+        <button class="icon-btn" onclick="captureCard(this.closest('.card'))" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="heatmap-table" id="heatmap-table"></table>
+    </div>
+  </div>
+
+  <!-- PAYMENT & FULFILLMENT -->
+  <div class="grid grid-2 reveal" style="margin-top:16px">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Payment Method Analysis</div>
+        <div class="card-actions">
+          <div class="lens-switcher">
+            <button class="lens-btn active" onclick="setPayLens('doughnut',this)">Doughnut</button>
+            <button class="lens-btn" onclick="setPayLens('bar',this)">Bar</button>
+            <button class="lens-btn" onclick="setPayLens('lolly',this)">Profit/Order</button>
+          </div>
+          <button class="icon-btn" onclick="downloadChart('pay-chart')" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+        </div>
+      </div>
+      <div id="pay-doughnut-wrap" class="chart-wrap"><canvas id="pay-chart"></canvas></div>
+      <div id="pay-bar-wrap" class="chart-wrap" style="display:none"><canvas id="pay-bar-chart"></canvas></div>
+      <div id="pay-lolly-wrap" style="display:none;padding:12px 0"><div class="lollipop-wrap" id="pay-lolly"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Fulfillment Channel Analysis</div>
+        <div class="card-actions">
+          <div class="lens-switcher">
+            <button class="lens-btn active" onclick="setFulfillLens('doughnut',this)">Doughnut</button>
+            <button class="lens-btn" onclick="setFulfillLens('bar',this)">Bar</button>
+            <button class="lens-btn" onclick="setFulfillLens('lolly',this)">Profit/Order</button>
+          </div>
+          <button class="icon-btn" onclick="downloadChart('fulfill-chart')" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+        </div>
+      </div>
+      <div id="fulfill-doughnut-wrap" class="chart-wrap"><canvas id="fulfill-chart"></canvas></div>
+      <div id="fulfill-bar-wrap" class="chart-wrap" style="display:none"><canvas id="fulfill-bar-chart"></canvas></div>
+      <div id="fulfill-lolly-wrap" style="display:none;padding:12px 0"><div class="lollipop-wrap" id="fulfill-lolly"></div></div>
+    </div>
+  </div>
+
+  <!-- STATE GRID -->
+  <div class="card reveal" style="margin-top:16px">
+    <div class="card-header">
+      <div class="card-title">10-State Regional Performance</div>
+      <button class="icon-btn" onclick="captureCard(this.closest('.card'))" title="Download chart as PNG" aria-label="Download chart as PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></button>
+    </div>
+    <div class="state-grid" id="state-grid"></div>
+    <div class="divider"></div>
+    <div class="chart-wrap" style="margin-top:4px"><canvas id="state-chart"></canvas></div>
+  </div>
+</section>
+
+</main>
+
+<!-- DETAIL DRAWER -->
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div class="drawer-header">
+    <div>
+      <div class="drawer-title" id="drawer-title">Detail Inspector</div>
+      <div class="drawer-subtitle" id="drawer-subtitle"></div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-kpi-grid" id="drawer-kpis"></div>
+  <div class="drawer-section-title">TOP 5 CONTRIBUTORS</div>
+  <div class="prog-bar-wrap" id="drawer-top5"></div>
+  <div class="drawer-section-title">PAYMENT & FULFILLMENT SPLIT</div>
+  <div id="drawer-splits"></div>
+  <div class="drawer-section-title">RECENT ORDERS</div>
+  <div id="drawer-orders"></div>
+  <button class="comp-btn" id="drawer-comp-btn" onclick="sendToComparison()">⚡ Send to Comparison Studio as Entity A</button>
+</div>
+
+<!-- DROPZONE MODAL -->
+<div id="dropzone-modal">
+  <div class="dropzone-box">
+    <div style="font-size:1.3rem;font-weight:800;color:var(--text-h);margin-bottom:4px">Load Sales Data</div>
+    <div style="font-size:0.78rem;color:var(--text-sm)">Drop your Amazon Sales Data .xlsx or .csv file to re-index the dashboard</div>
+    <div class="dropzone-area" id="dropzone-area" onclick="document.getElementById('file-input').click()" ondragover="dzDragOver(event)" ondrop="dzDrop(event)" ondragleave="dzLeave(event)">
+      <div class="dropzone-icon">📂</div>
+      <div class="dropzone-title">Drop file here or click to browse</div>
+      <div class="dropzone-sub">Supports .xlsx and .csv · 10,000+ rows</div>
+    </div>
+    <input type="file" id="file-input" accept=".xlsx,.csv" onchange="handleFileInput(event)">
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px" onclick="closeDropzone()">Use Built-In Dataset</button>
+    <div style="font-size:0.68rem;color:var(--text-xs);margin-top:10px">Amazon Sales Data India.xlsx · 10,000 rows · 2024–2026</div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+<!-- ═══════════════════════════ CHAT WIDGET ═══════════════════════════════ -->
+
+<!-- Floating launcher button -->
+<button id="chat-launcher" onclick="toggleChatPanel()" aria-label="Ask Data Assistant" aria-expanded="false">
+  <span id="chat-badge" aria-live="polite"></span>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    <line x1="9" y1="10" x2="15" y2="10"/><line x1="12" y1="7" x2="12" y2="13"/>
+  </svg>
+</button>
+
+<!-- Expandable chat panel -->
+<div id="chat-panel" role="dialog" aria-modal="true" aria-label="Sapphire IQ Data Assistant">
+
+  <!-- Panel header -->
+  <div id="chat-header">
+    <div class="chat-header-top">
+      <div class="chat-title">
+        <span class="chat-title-dot"></span>
+        Sapphire IQ Data Assistant
+      </div>
+      <div class="chat-header-btns">
+        <button id="chat-clear" class="chat-hdr-btn" onclick="clearChat()" title="Clear conversation" aria-label="Clear chat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.4"/></svg>
+        </button>
+        <button id="chat-close" class="chat-hdr-btn" onclick="closeChatPanel()" title="Close" aria-label="Close chat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="chat-scope-badge">
+      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true"><circle cx="4" cy="4" r="3" fill="#10B981"/></svg>
+      <span id="chat-scope-txt">Analyzing 10,000 Orders</span>
+    </div>
+  </div>
+
+  <!-- Scrollable message feed -->
+  <div id="chat-feed" aria-live="polite" aria-label="Chat messages"></div>
+
+  <!-- Quick-prompt suggestion chips -->
+  <div id="chat-suggestions" role="list" aria-label="Suggested questions">
+    <span class="chat-chip" role="listitem" onclick="chatSendQuery('Overall business summary')">Overall business summary</span>
+    <span class="chat-chip" role="listitem" onclick="chatSendQuery('Which category has the highest profit?')">Highest profit category</span>
+    <span class="chat-chip" role="listitem" onclick="chatSendQuery('Why are we losing revenue?')">Revenue leakage?</span>
+    <span class="chat-chip" role="listitem" onclick="chatSendQuery('Compare Electronics vs Home &amp; Kitchen')">Electronics vs Home</span>
+    <span class="chat-chip" role="listitem" onclick="chatSendQuery('Top 5 states by profit')">Top 5 states</span>
+    <span class="chat-chip" role="listitem" onclick="chatSendQuery('Compare UPI vs COD')">UPI vs COD</span>
+  </div>
+
+  <!-- Input bar -->
+  <div id="chat-input-bar">
+    <input id="chat-input" type="text" placeholder="Ask about sales, profit, comparisons…" autocomplete="off" aria-label="Type your question">
+    <button id="chat-send" onclick="sendChatMessage()" title="Send" aria-label="Send message">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+
+</div>
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+
+</div><!-- /#dashboard-wrapper -->
+
+  <!-- App scripts: load after CDNs, in dependency order -->
+  <script defer src="js/data.js"></script>
+  <script defer src="js/charts.js"></script>
+  <script defer src="js/chatbot.js"></script>
+</body>
+</html>
+
